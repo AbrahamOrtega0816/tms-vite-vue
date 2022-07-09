@@ -11,17 +11,15 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from "vue";
+import { computed, defineAsyncComponent, defineComponent } from "vue";
 import { darkTheme } from "naive-ui";
 import { useRouter } from "./utils";
-import LayoutBlank from "@/layout/Blank.vue";
-import LayoutContent from "@/layout/Content.vue";
 import { GlobalThemeOverrides } from "naive-ui";
 
 export default defineComponent({
   components: {
-    LayoutBlank,
-    LayoutContent,
+    LayoutBlank: defineAsyncComponent(() => import("@/layout/Blank.vue")),
+    LayoutContent: defineAsyncComponent(() => import("@/layout/Content.vue")),
   },
   setup() {
     const { route } = useRouter();

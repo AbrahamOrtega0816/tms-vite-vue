@@ -1,51 +1,33 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import { useStore } from "@/stores";
 
-
-
-const ifNotAuthenticated = (to: any, from: any, next: any) => {
-
-  const store = useStore();
-
-  if (!store.isAuthenticated) {
-    next();
-    return;
-  }
-  next("/");
-};
-
-const ifAuthenticated = (to: any, from: any, next: any) => {
-
- const store = useStore();
-
-  if (store.isAuthenticated) {
-    next();
-    return;
-  }
-  next("/login");
-};
-
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
     name: "home",
     alias: '/home',
     component: () => import("@/views/home/Home.vue"),
-    beforeEnter: ifAuthenticated,
+    meta: {
+      requiredAuth : true
+    },
   },
   {
     path: "/quote",
     name: "quote",
     alias: ['/:new(new)/quote/:id([0-9]+)','/quote/:id([0-9]+)'],
     component: () => import("@/views/quote/Quote.vue"),
-    beforeEnter: ifAuthenticated,
+    meta: {
+      requiredAuth : true
+    },
   },
   {
     path: "/quote",
     name: "shipment",
     alias: ['/:new(new)/shipment/:id([0-9]+)','/shipment/:id([0-9]+)'],
     component: () => import("@/views/shipment/Shipment.vue"),
-    beforeEnter: ifAuthenticated,
+    meta: {
+      requiredAuth : true
+    },
   },
   {
     path: "/login",
@@ -53,8 +35,8 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("@/views/login/Login.vue"),
     meta: {
       layout: "blank",
+      requiredAuth : false
     },
-    beforeEnter: ifNotAuthenticated,
   },
   {
     path: "/404",
@@ -70,9 +52,26 @@ const routes: Array<RouteRecordRaw> = [
   },
 ];
 
+
+
 const router = createRouter({
   history: createWebHistory(),
   routes,
 });
+
+
+router.beforeEach((to) => {
+  // ✅ This will work because the router starts its navigation after
+  // the router is installed and pinia will be installed too
+  const store = useStore();
+  store.setLoading(true)
+  if (to.meta.requiredAuth && !store.isAuthenticated) return '/login'
+});
+
+router.afterEach(()=>{
+  const store = useStore();
+  store.setLoading(false)
+});
+
 
 export default router;

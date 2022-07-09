@@ -1,8 +1,9 @@
 <template>
+  <n-back-top :right="100" />
   <n-tabs
-    v-model:value="name"
-    addable
     animated
+    v-model:value="currentTabIndex"
+    addable
     type="card"
     closable
     tab-style="min-width: 80px;"
@@ -17,10 +18,12 @@
       </n-button>
     </template>
     <n-tab-pane
-      v-for="panel in panels"
-      :key="panel"
-      :tab="panel.toString()"
-      :name="panel"
+      v-for="tab in tabs"
+      v-memo="[tab]"
+      :key="tab.id"
+      :tab="tab.name"
+      :name="tab.id"
+      class="min-height"
     >
       <slot></slot>
     </n-tab-pane>
@@ -33,61 +36,85 @@
     </template>
   </n-tabs>
   <ModalConfirm
+    v-memo="[showModal]"
     v-if="showModal"
     :openModal="showModal"
-    @on-change-open-modal="(open) => showModal = open"
+    @on-change-open-modal="(open) => (showModal = open)"
     @on-click-type-module="(type) => onAddNewTab(type)"
   />
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import {
+  computed,
+  defineAsyncComponent,
+  defineComponent,
+  ref,
+  watchEffect,
+} from "vue";
 import {
   ArrowBack as ArrowBackcon,
   ArrowForward as ArrowForwardIcon,
 } from "@vicons/ionicons5";
-import ModalConfirm from "./components/ModalConfirm.vue";
+import { useStore } from "@/stores/tabsStores";
+import { Imodule } from "@/common/constants/typeModule";
 
 export default defineComponent({
+  components: {
+    ModalConfirm: defineAsyncComponent(
+      () => import("./components/ModalConfirm.vue")
+    ),
+  },
   setup() {
-    const nameRef = ref(1);
-    const panelsRef = ref([1]);
+    const store = useStore();
+
+    const currentTabIndex = computed({
+      // getter
+      get() {
+        return store.getCurrentTabIndex;
+      },
+      // setter
+      set(newCurrentIndex: number) {
+        store.setCurrentIndex(newCurrentIndex);
+      },
+    });
+
+    const tabs = ref(store.getTabs);
+
     const showModal = ref(false);
-    const handleClose = (name: number) => {
-      const { value: panels } = panelsRef;
-      const index = panels.findIndex((v) => name === v);
-      panels.splice(index, 1);
-      if (nameRef.value === name) {
-        nameRef.value = panels[index];
-      }
-    };
-    const handleAdd = () => {
-      //   const newValue = panelsRef.value.length
-      //     ? Math.max(...panelsRef.value) + 1
-      //     : 1;
-      //   panelsRef.value.push(newValue);
-      //   nameRef.value = newValue;
-      showModal.value = true;
-    };
-    const onClickNextTab = () => {
-      if (nameRef.value < Math.max(...panelsRef.value))
-        nameRef.value = nameRef.value + 1;
-    };
-    const onClickPreviousTab = () => {
-      if (nameRef.value > Math.min(...panelsRef.value))
-        nameRef.value = nameRef.value - 1;
+
+    const handleClose = (id: number) => {
+      store.removeTab(id);
     };
 
-    const onAddNewTab = (type : number)=>{
-      console.log(type);
-    }
+    const handleAdd = () => {
+      showModal.value = true;
+    };
+
+    const onClickNextTab = () => {
+      if (currentTabIndex.value < Math.max(...tabs.value.map((tab) => tab.id)))
+        currentTabIndex.value = currentTabIndex.value + 1;
+    };
+
+    const onClickPreviousTab = () => {
+      if (currentTabIndex.value > Math.min(...tabs.value.map((tab) => tab.id)))
+        currentTabIndex.value = currentTabIndex.value - 1;
+    };
+
+    const onAddNewTab = (type: Imodule) => {
+      store.addTab(type);
+    };
+
+    watchEffect(() => {
+      if (tabs.value.length > 0) store.changeCurrentTab(currentTabIndex.value);
+    });
 
     return {
       ArrowForwardIcon,
       ArrowBackcon,
       showModal,
-      panels: panelsRef,
-      name: nameRef,
+      tabs,
+      currentTabIndex,
       handleClose,
       handleAdd,
       onClickNextTab,
@@ -95,6 +122,11 @@ export default defineComponent({
       onAddNewTab,
     };
   },
-  components: { ModalConfirm },
 });
 </script>
+
+<style lang="scss" scoped>
+  .min-height{
+        min-height: calc(100vh - 160px);
+  }
+</style>

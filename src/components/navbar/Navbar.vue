@@ -2,7 +2,7 @@
   <n-layout-header bordered>
     <n-grid :x-gap="12" :cols="2" class="is-align-items-center">
       <n-grid-item class="is-flex is-align-items-center">
-        <n-image width="70" :src="logo" />
+        <n-image lazy width="70" :src="logo" key="logo" />
         <div class="wrapper">
           <div class="bg">logistics</div>
           <div class="fg">logistics</div>
@@ -24,14 +24,12 @@
 
 <script lang="ts">
 import logo from "@/assets/logos/logo.png";
-import { defineComponent } from "vue";
-import Profile from "./components/Profile.vue";
-import Search from "./components/Search.vue";
+import { defineAsyncComponent, defineComponent } from "vue";
 
 export default defineComponent({
   components: {
-    Profile,
-    Search,
+    Profile: defineAsyncComponent(() => import("./components/Profile.vue")),
+    Search: defineAsyncComponent(() => import("./components/Search.vue")),
   },
   setup() {
     return {

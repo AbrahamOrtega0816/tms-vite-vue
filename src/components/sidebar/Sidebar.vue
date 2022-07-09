@@ -1,5 +1,6 @@
 <template>
   <n-layout-sider
+    v-once
     collapse-mode="width"
     :collapsed-width="84"
     :width="220"
@@ -8,6 +9,7 @@
     bordered
   >
     <n-menu
+      v-once
       :collapsed-width="64"
       :collapsed-icon-size="22"
       :options="menuOptions"
@@ -17,11 +19,10 @@
 </template>
 
 <script lang="ts">
-import { Component, computed, defineComponent, h, ref } from "vue";
-import { useRouter } from 'vue-router';
+import { Component, computed, defineComponent, h } from "vue";
+import { useRouter } from "vue-router";
 import { NIcon } from "naive-ui";
 import { HomeOutline as HomeIcon } from "@vicons/ionicons5";
-
 
 const renderIcon = (icon: Component) => {
   return () => h(NIcon, null, { default: () => h(icon) });
@@ -37,11 +38,10 @@ const menuOptions = [
 
 export default defineComponent({
   setup() {
-
     const currentRoute = computed(() => {
       return useRouter().currentRoute.value.name;
-    })
-  
+    });
+
     return {
       currentRoute,
       menuOptions,

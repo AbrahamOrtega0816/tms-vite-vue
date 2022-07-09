@@ -25,7 +25,8 @@
 <script lang="ts">
 import { defineComponent, ref, watchEffect } from "vue";
 import { CreateOutline as CreateOutlineIcon , ReceiptOutline as ReceiptOutlineIcon } from "@vicons/ionicons5";
-import { typeModules } from '@/common/constants/typeModule'
+import { Imodule, typeModules } from '@/common/constants/typeModule';
+
 
 export default defineComponent({
   props: {
@@ -34,11 +35,11 @@ export default defineComponent({
   emits: ["onChangeOpenModal","onClickTypeModule"],
   setup(props, { emit }) {
 
-    const open = ref(props.openModal);
+    const open = ref<boolean>(props.openModal);
 
     watchEffect(() => emit("onChangeOpenModal", open.value));
 
-    const onClickChoseModule = (module:number) =>{
+    const onClickChoseModule = (module: Imodule) =>{
       emit("onClickTypeModule", module);
       open.value = false;
     }

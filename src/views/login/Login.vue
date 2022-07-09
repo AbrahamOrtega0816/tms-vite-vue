@@ -8,7 +8,7 @@
     <n-grid-item class="is-flex is-align-self-flex-start ml-3">
       <n-grid :x-gap="2" :cols="1">
         <n-grid-item class="has-text-centered">
-          <n-image width="400" :src="logo" />
+          <n-image lazy width="400" :src="logo" key="login_logo" />
         </n-grid-item>
         <n-grid-item>
           <n-card>
@@ -28,7 +28,7 @@
                     name="password"
                     type="password"
                     as="n-input"
-                   show-password-on="mousedown"
+                    show-password-on="mousedown"
                     placeholder="password"
                   />
 
@@ -38,9 +38,11 @@
                     dashed
                     @click="handleSubmit"
                   >
-                    <font-awesome-icon
+                    <n-icon
                       v-if="!loader"
-                      :icon="['fa', 'arrow-right-to-bracket']"
+                      size="18"
+                      color="#F2C97DFF"
+                      :component="ArrowNext24RegularIcon"
                     />
                     <n-spin v-else size="small" />
                   </n-button>
@@ -55,13 +57,20 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, markRaw, reactive, ref } from "vue";
+import {
+  defineComponent,
+  markRaw,
+  reactive,
+  ref,
+  defineAsyncComponent,
+} from "vue";
 import logo from "@/assets/logos/logo.png";
 import { useLoadingBar, useNotification } from "naive-ui";
-import { Field, useForm, useField } from "vee-validate";
+import { Field, useForm } from "vee-validate";
 import * as yup from "yup";
 import route from "@/router";
 import { useStore } from "@/stores";
+import { ArrowNext24Regular as ArrowNext24RegularIcon } from "@vicons/fluent";
 
 interface LoginForm {
   email: string;
@@ -75,10 +84,14 @@ const validationSchema = markRaw(
   })
 );
 
+const AsyncField = defineAsyncComponent({
+  loader: async () => Field,
+  loadingComponent: () => import("@/components/loaderField/LoaderField.vue"),
+});
+
 export default defineComponent({
-  props: {},
   components: {
-    Field,
+    Field: AsyncField,
   },
   setup() {
     const store = useStore();
@@ -94,8 +107,6 @@ export default defineComponent({
         validationSchema,
       })
     );
-
-    const field = reactive(useField(""));
 
     const loader = ref(false);
 
@@ -126,7 +137,7 @@ export default defineComponent({
     };
 
     return {
-      field,
+      ArrowNext24RegularIcon,
       form,
       handleSubmit,
       logo,
