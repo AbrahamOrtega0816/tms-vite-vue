@@ -67,6 +67,7 @@ export default defineComponent({
     const { value: country } = useField(countryName);
 
     watch([city, country], async ([newCity, newCountry]) => {
+      response.value = [];
       if ((newCity as string).length > 2) {
         const params = {
           apiKey: import.meta.env.VITE_APP_BASE_HEREMAPS_APIKEY,

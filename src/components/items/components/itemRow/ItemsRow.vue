@@ -11,6 +11,9 @@
     </div>
   </td>
   <td>
+   <TypeSelector :index="index" />
+  </td>
+  <td>
     <Field :name="`items[${index}].quantity`" v-slot="{ handleChange, field }">
       <n-input
         type="text"
@@ -77,6 +80,29 @@
   </td>
   <td>
     <Field
+      :name="`items[${index}].declaredValue`"
+      v-slot="{ handleChange, field }"
+    >
+      <n-input
+        type="text"
+        :on-update:value="handleChange"
+        :default-value="field.value"
+        size="small"
+        clearable
+        @keypress="onlyAllowNumber"
+        placeholder="Declared value"
+      >
+        <template #prefix>
+          <n-icon
+            color="#F2C97DFF"
+            :component="AttachMoneyRoundIcon"
+          />
+        </template>
+      </n-input>
+    </Field>
+  </td>
+  <td>
+    <Field
       :name="`items[${index}].description`"
       v-slot="{ handleChange, field }"
     >
@@ -113,16 +139,20 @@ import {
   Box24Regular as Box24RegularIcon,
   Delete20Regular as Delete20RegularIcon,
 } from "@vicons/fluent";
+import {
+  AttachMoneyRound as AttachMoneyRoundIcon,
+} from "@vicons/material";
 import { Field } from "vee-validate";
 
 const AsyncField = defineAsyncComponent({
   loader: async () => Field,
-  loadingComponent: () => import("../../loaderField/LoaderField.vue"),
+  loadingComponent: () => import("../../../loaderField/LoaderField.vue"),
 });
 
 export default defineComponent({
   components: {
     Field: AsyncField,
+    TypeSelector : defineAsyncComponent(() => import("../typeSelector/TypeSelector.vue")),
   },
   props: {
     itemProp: Object,
@@ -147,6 +177,7 @@ export default defineComponent({
       remove,
       Box24RegularIcon,
       Delete20RegularIcon,
+      AttachMoneyRoundIcon
     };
   },
 });

@@ -34,11 +34,13 @@
           <thead class="has-text-centered">
             <tr>
               <th>#</th>
+              <th>Type</th>
               <th>Quantity</th>
               <th>Weight(Lb)</th>
               <th>Length(In)</th>
               <th>Width(In)</th>
               <th>Height(In)</th>
+              <th>Declared Value($)</th>
               <th>Description</th>
               <th>Actions</th>
             </tr>
@@ -71,18 +73,11 @@ import {
 } from "@vicons/fluent";
 import { itemsInitialValues } from "@/common/models/quoteModel";
 import { useFieldArray } from "vee-validate";
-import ItemsRow from "./components/ItemsRow.vue";
 import hotkeys from "hotkeys-js";
-
-const AsyncItemRow = defineAsyncComponent({
-  loader: async () => ItemsRow,
-  loadingComponent: () => import("../loaderField/LoaderField.vue"),
-});
 
 export default defineComponent({
   components: {
-    ItemRow: AsyncItemRow,
-    ItemsRow,
+    ItemsRow :  defineAsyncComponent(() => import("./components/itemRow/ItemsRow.vue")),
   },
   setup() {
     const { push, fields: items, remove } = useFieldArray("items");

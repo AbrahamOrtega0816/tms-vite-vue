@@ -1,7 +1,7 @@
 <template>
   <form class="pb-5">
-    <n-grid :x-gap="2" :cols="5" item-responsive>
-      <n-grid-item span="5 500:5 600:5 800:2" class="is-flex gap-20 py-3">
+    <n-grid :x-gap="2" :cols="6" item-responsive>
+      <n-grid-item span="6 500:6 600:6 800:2" class="is-flex gap-20 py-3">
         <n-grid
           item-responsive
           :x-gap="20"
@@ -30,8 +30,7 @@
           </n-grid-item>
         </n-grid>
       </n-grid-item>
-
-      <n-grid-item span="5 500:5 600:5 800:3" class="is-flex gap-20 py-3">
+      <n-grid-item span="6 500:6 600:6 800:4" class="is-flex gap-20 py-3">
         <n-grid :x-gap="20" :y-gap="20" :cols="3" item-responsive>
           <n-grid-item span="3 500:3 600:1 800:1">
             <ZipCode />
@@ -44,10 +43,16 @@
           </n-grid-item>
         </n-grid>
       </n-grid-item>
-      <n-grid-item span="5 500:5 600:5 800:5" class="mb-6">
+      <n-grid-item span="6 500:6 600:6 800:6" class="mb-2">
         <Items />
       </n-grid-item>
-      <n-grid-item span="5 500:5 600:5 800:5" class="quote-actions">
+      <n-grid-item span="6 500:6 600:6 800:6" class="mb-6 mt-4">
+        <PaymentMethod />
+      </n-grid-item>
+      <n-grid-item span="3 500:3 600:3 800:3">
+        <Accessorials />
+      </n-grid-item>
+      <n-grid-item span="6 500:6 600:6 800:6" class="quote-actions">
         <QuoteActions />
       </n-grid-item>
     </n-grid>
@@ -73,22 +78,17 @@ import { ArrowForwardCircleOutline as ArrowForwardCircleOutlineIconn } from "@vi
 import { storeToRefs } from "pinia";
 import { cloneDeep } from "lodash";
 
+
 export default defineComponent({
   components: {
-    CountrySelector: defineAsyncComponent(
-      () => import("@/components/countrySelector/CountrySelector.vue")
-    ),
-    ZipCode: defineAsyncComponent(
-      () => import("@/components/zipCode/ZipCode.vue")
-    ),
-    PickupDate: defineAsyncComponent(
-      () => import("@/components/pickupDate/pickupDate.vue")
-    ),
-    Items: defineAsyncComponent(() => import("@/components/items/items.vue")),
-    QuoteActions: defineAsyncComponent(
-      () => import("./components/QuoteActions.vue")
-    ),
-  },
+    CountrySelector: defineAsyncComponent(() => import("@/components/countrySelector/CountrySelector.vue")),
+    ZipCode: defineAsyncComponent(() => import("@/components/zipCode/ZipCode.vue")),
+    PickupDate: defineAsyncComponent(() => import("@/components/pickupDate/pickupDate.vue")),
+    Items: defineAsyncComponent(() => import("@/components/items/Items.vue")),
+    QuoteActions: defineAsyncComponent(() => import("./components/QuoteActions.vue")),
+    PaymentMethod: defineAsyncComponent(() => import("@/components/paymentMethod/PaymentMethod.vue")),
+    Accessorials: defineAsyncComponent(() => import("@/components/accessorials/Accessorials.vue")),
+},
   setup() {
     const store = useStore();
 

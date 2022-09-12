@@ -162,5 +162,3 @@ export default defineComponent({
   background-size: cover;
 }
 </style>
-
-function useRoute() { throw new Error("Function not implemented."); }
