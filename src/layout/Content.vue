@@ -3,13 +3,17 @@
     <Navbar />
     <n-layout has-sider class="h-100" embedded>
       <Sidebar />
-      <n-layout-content 
+      <n-layout-content
         content-style="padding: 24px;padding-bottom:90px;"
         :native-scrollbar="false"
       >
         <TabManager>
-          <loading v-if="isLoading" :is-full-page="false"
-          v-model:active="isLoading" color="#F2C97DFF" />
+          <loading
+            v-if="isLoading"
+            :is-full-page="false"
+            v-model:active="isLoading"
+            color="#F2C97DFF"
+          />
           <router-view></router-view>
         </TabManager>
       </n-layout-content>
@@ -20,8 +24,11 @@
 <script lang="ts">
 import { computed, defineAsyncComponent, defineComponent } from "vue";
 import instance from "@/services/axiosManager";
-import { useLoadingBar } from "naive-ui";
+import { useLoadingBar, useMessage } from "naive-ui";
 import { useStore } from "@/stores";
+import { authService } from "@/services";
+import { StatusCodes } from "http-status-codes";
+import route from "@/router";
 
 export default defineComponent({
   components: {
@@ -39,13 +46,14 @@ export default defineComponent({
   setup() {
     const loadingBar = useLoadingBar();
 
-    const store = useStore()
-
-    const isLoading = computed(()=> store.loading)
+    const store = useStore();
+    const message = useMessage();
+    const isLoading = computed(() => store.loading);
 
     instance.interceptors.request.use(
       (config) => {
         loadingBar.start();
+        config.headers!.Authorization = `Bearer ${store.getToken}`;
         return config;
       },
       (error) => {
@@ -60,17 +68,29 @@ export default defineComponent({
         const res = response.data;
         return res;
       },
-      (error) => {
+      async (error) => {
         loadingBar.error();
-        if (error.response.status === 401) {
-          console.log("Unauthorized Request");
+        if (error.response.status === StatusCodes.UNAUTHORIZED) {
+          await authService
+            .logout()
+            .then(async (res) => {
+              if (res.status === StatusCodes.OK) {
+                store.singOut();
+                route.push("/login");
+              } else {
+                message.error(`${message}`);
+              }
+            })
+            .catch((err) => {
+              message.error(`${err.errors?.message || "Error"}`);
+            });
         }
         return Promise.reject(error?.response?.data || error);
       }
     );
 
     return {
-      isLoading
+      isLoading,
     };
   },
 });

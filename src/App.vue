@@ -3,7 +3,10 @@
     <n-loading-bar-provider>
       <n-dialog-provider>
         <n-notification-provider>
-          <component :is="resolveLayout" />
+          <n-message-provider :placement="placement" :duration="duration">
+            <component :is="resolveLayout" />
+            <VueQueryDevTools />
+          </n-message-provider>
         </n-notification-provider>
       </n-dialog-provider>
     </n-loading-bar-provider>
@@ -11,19 +14,27 @@
 </template>
 
 <script lang="ts">
-import { computed, defineAsyncComponent, defineComponent } from "vue";
-import { darkTheme } from "naive-ui";
+import {
+  computed,
+  defineAsyncComponent,
+  defineComponent,
+  ref,
+} from "vue";
+import { darkTheme, MessageProviderProps } from "naive-ui";
 import { useRouter } from "./utils";
 import { GlobalThemeOverrides } from "naive-ui";
+import { VueQueryDevTools } from "vue-query/devtools";
 
 export default defineComponent({
   components: {
     LayoutBlank: defineAsyncComponent(() => import("@/layout/Blank.vue")),
     LayoutContent: defineAsyncComponent(() => import("@/layout/Content.vue")),
+    VueQueryDevTools
   },
   setup() {
     const { route } = useRouter();
-
+    const placement = ref<MessageProviderProps['placement']>('top-right')
+    const duration = ref<MessageProviderProps['duration']>(5000)
     const resolveLayout = computed(() => {
       // Handles initial route
       if (route?.value?.name === null) return null;
@@ -43,6 +54,8 @@ export default defineComponent({
     };
 
     return {
+      duration,
+      placement,
       resolveLayout,
       darkTheme,
       themeOverrides,
@@ -52,5 +65,5 @@ export default defineComponent({
 </script>
 
 <style scoped>
-  @import "@/assets/main.scss";
+@import "@/assets/main.scss";
 </style>

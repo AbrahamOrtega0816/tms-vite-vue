@@ -52,7 +52,7 @@ export default defineComponent({
       ? "destinationCountry"
       : "originCountry";
 
-    const response = ref<Array<Item>>([])
+    const response = ref<Array<Item>>([]);
 
     const options = computed(() => {
         return [...response.value].map((opt) => {

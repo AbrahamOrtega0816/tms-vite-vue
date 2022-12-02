@@ -1,5 +1,6 @@
 import { createPinia } from 'pinia'
 import { createApp } from 'vue'
+import { VueQueryPlugin } from "vue-query"
 import naive from 'naive-ui'
 import App from './App.vue'
 import router from './router'
@@ -19,7 +20,7 @@ const app = createApp(App)
 
 app.use(pinia)
 app.use(router)
-
+app.use(VueQueryPlugin);
 app.use(naive)
 
 app.use(FlagIcon);

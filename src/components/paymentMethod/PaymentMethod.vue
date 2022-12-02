@@ -2,7 +2,7 @@
   <Field name="paymentMethod" v-slot="{ field: { value }, handleChange }">
     <n-radio-group
       :on-update:value="handleChange"
-      :default-value="value"
+      :value="value"
       name="radiogroup"
     >
       <n-space>

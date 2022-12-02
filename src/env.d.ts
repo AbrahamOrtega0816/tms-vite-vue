@@ -8,3 +8,4 @@ declare module '*.vue' {
 }
 
 declare module 'vue-flag-icon'
+declare module 'crypto-js'

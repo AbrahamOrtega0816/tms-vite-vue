@@ -22,7 +22,7 @@
                     type="email"
                     as="n-input"
                     autofocus
-                    placeholder="User"
+                    placeholder="user"
                   />
                   <Field
                     name="password"
@@ -62,25 +62,23 @@ import {
   markRaw,
   reactive,
   ref,
-  defineAsyncComponent,
+  defineAsyncComponent
 } from "vue";
 import logo from "@/assets/logos/logo.png";
-import { useLoadingBar, useNotification } from "naive-ui";
+import { useLoadingBar, useMessage } from "naive-ui";
 import { Field, useForm } from "vee-validate";
 import * as yup from "yup";
 import route from "@/router";
-import { useStore } from "@/stores";
 import { ArrowNext24Regular as ArrowNext24RegularIcon } from "@vicons/fluent";
-
-interface LoginForm {
-  email: string;
-  password: string;
-}
+import { LoginForm } from "@/common/models/globalModel";
+import { authService } from "@/services";
+import { StatusCodes } from "http-status-codes";
+import CryptoJS from 'crypto-js';
 
 const validationSchema = markRaw(
   yup.object({
     email: yup.string().email().required(),
-    password: yup.string().min(8).required(),
+    password: yup.string().min(6).required(),
   })
 );
 
@@ -94,9 +92,8 @@ export default defineComponent({
     Field: AsyncField,
   },
   setup() {
-    const store = useStore();
     const loadingBar = useLoadingBar();
-    const notification = useNotification();
+    const message = useMessage();
 
     const form = reactive(
       useForm<LoginForm>({
@@ -111,29 +108,41 @@ export default defineComponent({
     const loader = ref(false);
 
     const handleSubmit = async () => {
-      loader.value = true;
-      loadingBar.start();
-
       const {
         meta: { valid },
         values,
       } = form;
 
       if (valid) {
-        store.setToken(values.email);
-        loadingBar.finish();
-        loader.value = false;
-        route.push("/");
-      } else {
-        notification.warning({
-          title: "What to say?",
-        });
-      }
+        loader.value = true;
+        loadingBar.start();
 
-      setTimeout(() => {
-        loader.value = false;
-        loadingBar.finish();
-      }, 1000);
+        const params = {
+          ...values
+        }
+
+        params.password = 
+        CryptoJS.AES.encrypt(params.password, import.meta.env.VITE_APP_SECRET_KEY).toString();
+
+        await authService
+          .login(params)
+          .then(async (res) => {
+            if (res.status === StatusCodes.OK) {
+               route.push("/");
+            } else {
+              message.error(`${message}`);
+            }
+          })
+          .catch((err) => {
+            message.error(`${err.errors || "Error"}`);
+          })
+          .finally(() => {
+            loadingBar.finish();
+            loader.value = false;
+          });
+      } else {
+        message.warning(`Please valid your information`);
+      }
     };
 
     return {
